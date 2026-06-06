@@ -7,6 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 5000
-
-CMD ["sh", "-c", "gunicorn -b 0.0.0.0:${PORT:-5000} app:app"]
+CMD ["python", "main.py"]

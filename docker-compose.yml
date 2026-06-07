@@ -1,6 +1,36 @@
 services:
+
+  mcp_server_jumbo:
+    build: ./mcp_server_jumbo
+    env_file:
+      - .env
+    ports:
+      - "${JUMBO_MCP_PORT}:${JUMBO_MCP_PORT}"
+    restart: unless-stopped
+    networks:
+      - nutricheck
+
+  mcp_server_sellos:
+    build: ./mcp_server_sellos
+    env_file:
+      - .env
+    ports:
+      - "${SELLOS_MCP_PORT}:${SELLOS_MCP_PORT}"
+    restart: unless-stopped
+    networks:
+      - nutricheck
+
   bot:
-    build: .
+    build: ./bot
     env_file:
       - .env
     restart: unless-stopped
+    depends_on:
+      - mcp_server_jumbo
+      - mcp_server_sellos
+    networks:
+      - nutricheck
+
+networks:
+  nutricheck:
+    driver: bridge

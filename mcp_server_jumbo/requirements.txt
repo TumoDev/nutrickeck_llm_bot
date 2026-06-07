@@ -1,0 +1,7 @@
+mcp[cli]>=1.5.0
+uvicorn
+starlette
+playwright
+requests
+beautifulsoup4
+lxml

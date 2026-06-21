@@ -1,3 +1,13 @@
 requests
 python-dotenv
 mistralai>=1.5.0,<2.0.0
+
+# RAG local (CSV + recuperación híbrida)
+pandas
+numpy
+scikit-learn
+chromadb
+sentence-transformers
+
+# Orquestación del workflow como grafo
+langgraph

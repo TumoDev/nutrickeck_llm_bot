@@ -23,7 +23,7 @@ DICCIONARIO_TECNICO = {
     "diabetes":     ["azúcar", "glucosa", "carbohidratos", "fibra", "maltodextrina"],
     "cáncer":       ["nitritos", "procesados", "conservantes", "grasas saturadas"],
     "respiratorias":["sulfitos", "alérgenos", "inflamatorio"],
-    "salud mental": ["magnesio", "omega 3", "triptófano", "proteína", "vitaminas"],
+    "depresión":    ["magnesio", "omega 3", "triptófano", "proteína", "vitaminas"],
 }
 
 CONDICIONES_VALIDAS = set(DICCIONARIO_TECNICO.keys())

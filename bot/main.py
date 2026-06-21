@@ -1,11 +1,13 @@
 """Entry point: long polling de Telegram — no requiere URL pública."""
 
+import json
 import logging
 import time
 
 import requests
 
 from app import NutriCheckRAG, config
+from app.graph import NutriCheckGraph
 from app.telegram_bot import TELEGRAM_API, handle_update
 
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +27,12 @@ def _delete_webhook() -> None:
 
 
 def _get_updates(offset=None, timeout=30) -> list:
-    params = {"timeout": timeout, "allowed_updates": ["message"]}
+    # allowed_updates DEBE ir como JSON string; si se pasa como lista, requests la
+    # serializa con claves repetidas y Telegram NO entrega los callback_query (botones).
+    params = {
+        "timeout": timeout,
+        "allowed_updates": json.dumps(["message", "callback_query"]),
+    }
     if offset is not None:
         params["offset"] = offset
     try:
@@ -44,15 +51,15 @@ def _get_updates(offset=None, timeout=30) -> list:
 def main() -> None:
     _delete_webhook()
 
-    logger.info("Inicializando NutriCheckRAG…")
-    rag = NutriCheckRAG()
-    logger.info("NutriCheckRAG listo. Esperando mensajes de Telegram…")
+    logger.info("Inicializando NutriCheck (grafo LangGraph)…")
+    agente = NutriCheckGraph(NutriCheckRAG())
+    logger.info("NutriCheck listo. Esperando mensajes de Telegram…")
 
     offset = None
     while True:
         updates = _get_updates(offset=offset)
         for update in updates:
-            handle_update(update, rag)
+            handle_update(update, agente)
             offset = update["update_id"] + 1
 
 

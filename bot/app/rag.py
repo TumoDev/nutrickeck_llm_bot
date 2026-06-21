@@ -268,41 +268,76 @@ class NutriCheckRAG:
             logger.warning("Extracción de producto falló (%s); uso la pregunta cruda.", e)
             return pregunta
 
-    def describir_producto_foto(self, imagen_b64: str) -> str:
-        """Visión de Mistral: identifica el producto de una foto y devuelve su descripción
-        (nombre comercial, marca y datos visibles). Para el modo foto del bot."""
+    def extraer_producto_foto(self, imagen_b64: str) -> dict:
+        """Visión de Mistral: LEE la etiqueta de la foto y devuelve el producto estructurado
+        (nombre, marca, nutrición y sellos visibles). Se analiza con ESTOS datos, sin buscar
+        en Jumbo. Devuelve {} si no se pudo identificar."""
         try:
             r = self.client.chat.complete(
                 model=self.mistral_model,
                 messages=[
                     {"role": "system", "content":
-                        "Eres un identificador de productos alimentarios chilenos. Mira la foto "
-                        "y di qué producto es: nombre comercial y marca, y si se ven, tamaño o "
-                        "datos nutricionales. Sé breve y directo, sin análisis ni opiniones."},
+                        "Eres un lector de etiquetas de alimentos chilenos. Mira la foto y "
+                        "extrae SOLO lo que se ve. Responde un JSON con: nombre, marca, "
+                        "es_liquido (bool), nutricion (objeto con calorias_kcal, azucares_g, "
+                        "sodio_mg, grasas_sat_g por 100 g/ml; usa null si la tabla no se ve), "
+                        "ingredientes (texto o ''), y sellos (lista de sellos negros "
+                        "'ALTO EN ...' impresos en el envase, o null si no se ven). "
+                        "No inventes valores que no aparezcan en la imagen."},
                     {"role": "user", "content": [
-                        {"type": "text", "text": "¿Qué producto es este?"},
+                        {"type": "text", "text": "Extrae los datos del producto de esta foto."},
                         {"type": "image_url",
                          "image_url": f"data:image/jpeg;base64,{imagen_b64}"},
                     ]},
                 ],
                 temperature=0,
+                response_format={"type": "json_object"},
             )
-            return (r.choices[0].message.content or "").strip()
+            data = json.loads(r.choices[0].message.content)
         except Exception as e:
-            logger.warning("Descripción de foto falló: %s", e)
-            return ""
+            logger.warning("Lectura de foto falló: %s", e)
+            return {}
+
+        if not str(data.get("nombre") or "").strip():
+            return {}  # no se pudo identificar
+
+        def _num(v):
+            try:
+                return float(v)
+            except (TypeError, ValueError):
+                return 0.0
+
+        nutri = data.get("nutricion") or {}
+        return {
+            "nombre":       str(data.get("nombre", "")),
+            "marca":        str(data.get("marca", "") or ""),
+            "categoria":    "",
+            "ingredientes": str(data.get("ingredientes", "") or ""),
+            "es_liquido":   bool(data.get("es_liquido", False)),
+            "nutricion": {
+                "calorias_kcal": _num(nutri.get("calorias_kcal")),
+                "azucares_g":    _num(nutri.get("azucares_g")),
+                "sodio_mg":      _num(nutri.get("sodio_mg")),
+                "grasas_sat_g":  _num(nutri.get("grasas_sat_g")),
+            },
+            "sellos":  data.get("sellos"),  # lista visible en el envase, o None
+            "_fuente": "foto",
+        }
 
     def _buscar_producto(self, pregunta: str, patologia: Optional[str], t: Traza,
-                         producto_foto: Optional[str] = None) -> dict:
-        """Paso FIJO (siempre se ejecuta, no es function call): determina el producto y lo
-        busca en el RAG local; si no hay match confiable, cae al scraping Jumbo."""
+                         producto_directo: Optional[dict] = None) -> dict:
+        """Paso FIJO. Si viene un producto leído de una foto, se usa TAL CUAL (sin buscar en
+        fuentes externas). Si no, se busca en el RAG local y, si falla, en el scraping Jumbo."""
         t.nodo("📦 buscar_producto  (paso fijo — siempre se ejecuta)")
-        if producto_foto:
-            query = producto_foto  # ya identificado desde la foto
-            t.info(f"producto de la foto: '{query}'")
-        else:
-            query = self._extraer_producto(pregunta)
-            t.info(f"producto extraído: '{query}'")
+        if producto_directo:
+            t.info(f"producto leído de la foto: '{producto_directo.get('nombre', '?')}' "
+                   "→ se analiza con los datos de la imagen (NO se busca en Jumbo)")
+            t.muta("producto_datos", {**self._resumen_producto(producto_directo), "fuente": "foto"})
+            t.fin_paso()
+            return producto_directo
+
+        query = self._extraer_producto(pregunta)
+        t.info(f"producto extraído: '{query}'")
         t.fin_paso()
 
         producto = self._herramienta_rag_local(query, patologia, t)
@@ -430,14 +465,14 @@ class NutriCheckRAG:
     # ── Orquestación (el "router" + ciclo) ───────────────────────────────────────
 
     def ask(self, pregunta: str, condicion: Optional[str] = None,
-            producto_foto: Optional[str] = None) -> Tuple[str, list]:
+            producto_directo: Optional[dict] = None) -> Tuple[str, list]:
         t = Traza()
         t.inicio(pregunta, condicion)
 
         perfil = self._nodo_analizador_llm(pregunta, condicion, t)
 
         # Paso FIJO: buscar_producto siempre se ejecuta (no es function call).
-        producto = self._buscar_producto(pregunta, perfil.get("patologia"), t, producto_foto)
+        producto = self._buscar_producto(pregunta, perfil.get("patologia"), t, producto_directo)
 
         if producto.get("error"):
             reporte = f"{config.DISCLAIMER}\n\n❌ {producto['error']}"

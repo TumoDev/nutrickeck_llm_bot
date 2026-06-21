@@ -255,18 +255,25 @@ def _handle_photo(chat_id: int, message: dict, rag: NutriCheckRAG) -> None:
         _send_message(chat_id, f"❌ No pude descargar la foto: {e}")
         return
 
-    descripcion = rag.describir_producto_foto(imagen_b64)
-    if not descripcion:
+    producto = rag.extraer_producto_foto(imagen_b64)
+    if not producto:
         _send_message(chat_id,
                       "🤔 No pude identificar el producto en la foto. "
                       "Prueba con otra imagen más clara, o usa el modo *Texto*.")
         return
 
-    _producto_foto[chat_id] = descripcion  # queda a la espera de la pregunta
+    _producto_foto[chat_id] = producto  # producto completo leído de la foto
+
+    nutri = producto.get("nutricion", {})
+    nombre = producto.get("nombre", "Producto")
+    marca = producto.get("marca", "")
+    encabezado = f"{nombre}" + (f" — {marca}" if marca else "")
+    detalle = (f"📊 Por 100 g/ml: Azúcar {nutri.get('azucares_g', 0)} g · "
+               f"Sodio {nutri.get('sodio_mg', 0)} mg · Grasas sat {nutri.get('grasas_sat_g', 0)} g")
     _send_message(chat_id,
-                  f"📷 En la foto identifiqué:\n\n*{descripcion}*\n\n"
-                  "¿Qué quieres saber de este producto? Escríbeme tu pregunta "
-                  "(ej: _¿es alto en azúcar?_).")
+                  f"📷 En la foto leí:\n\n*{encabezado}*\n{detalle}\n\n"
+                  "¿Qué quieres saber de este producto? Lo analizaré con estos datos de la "
+                  "imagen (ej: _¿es apto para mí?_).")
 
 
 # ── Punto de entrada ────────────────────────────────────────────────────────────
@@ -313,12 +320,12 @@ def handle_update(update: dict, rag: NutriCheckRAG) -> None:
     if not text:
         return
 
-    # Si hay un producto identificado por foto, la pregunta se refiere a ÉL.
-    producto_foto = _producto_foto.get(chat_id)
+    # Si hay un producto leído de una foto, la pregunta se analiza con ESOS datos.
+    producto_directo = _producto_foto.get(chat_id)
     condicion = _condiciones.get(chat_id)
     _send_message(chat_id, "🔎 Analizando producto…")
     try:
-        respuesta, _ = rag.ask(text, condicion=condicion, producto_foto=producto_foto)
+        respuesta, _ = rag.ask(text, condicion=condicion, producto_directo=producto_directo)
     except Exception as e:
         logger.exception("Error en RAG para chat %s", chat_id)
         _send_message(chat_id, f"❌ Error al procesar tu consulta: {e}")

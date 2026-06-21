@@ -34,7 +34,7 @@ class NutriCheckProductionState(TypedDict, total=False):
     """Estado que fluye y muta a lo largo del grafo."""
     pregunta: str
     condicion: Optional[str]
-    producto_foto: Optional[str]
+    producto_directo: Optional[dict]
     perfil_clinico: dict
     producto_datos: dict
     product_found: bool
@@ -67,7 +67,7 @@ class NutriCheckGraph:
     def _mcp_jumbo_scraper(self, state: NutriCheckProductionState) -> dict:
         producto = self.rag._buscar_producto(
             state["pregunta"], state["perfil_clinico"].get("patologia"),
-            self._t, state.get("producto_foto"))
+            self._t, state.get("producto_directo"))
         return {"producto_datos": producto, "product_found": not producto.get("error")}
 
     def _parser_de_datos(self, state: NutriCheckProductionState) -> dict:
@@ -148,12 +148,12 @@ class NutriCheckGraph:
     # ── API compatible con el bot (drop-in de NutriCheckRAG) ──────────────────────
 
     def ask(self, pregunta: str, condicion: Optional[str] = None,
-            producto_foto: Optional[str] = None):
+            producto_directo: Optional[dict] = None):
         estado: NutriCheckProductionState = {
-            "pregunta": pregunta, "condicion": condicion, "producto_foto": producto_foto,
+            "pregunta": pregunta, "condicion": condicion, "producto_directo": producto_directo,
         }
         final = self.app.invoke(estado)
         return final.get("mensaje_final", ""), []
 
-    def describir_producto_foto(self, imagen_b64: str) -> str:
-        return self.rag.describir_producto_foto(imagen_b64)
+    def extraer_producto_foto(self, imagen_b64: str) -> dict:
+        return self.rag.extraer_producto_foto(imagen_b64)

@@ -1,0 +1,95 @@
+
+================================================================================
+📊 REPORTE COMPARATIVO DE BASELINES
+================================================================================
+
+                               RESUMEN EJECUTIVO                                
+--------------------------------------------------------------------------------
+
+
+╔════════════════════════════════════════════════════════════════════════╗
+║ BASELINE: SIMPLE                    | CASOS:  10                    ║
+╠════════════════════════════════════════════════════════════════════════╣
+║ Exactitud Sellos (Ley 20.606):       20.00% ± 42.16%  ║
+║ Tasa Omisión Riesgo Clínico:         80.00% ± 42.16%  ║
+║ Tasa Corrección Efectiva:             0.00% ±  0.00%  ║
+╠════════════════════════════════════════════════════════════════════════╣
+║ Latencia Promedio:                        0 ms ±      1    ║
+║ Llamadas LLM (promedio):              0 llamadas                    ║
+║ Llamadas API (promedio):              1 llamadas                    ║
+║ Costo Combinado:                      0.000                       ║
+║ Tasa de Errores:                    100.00%                      ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════════════════════════════════╗
+║ BASELINE: REACT                     | CASOS:  10                    ║
+╠════════════════════════════════════════════════════════════════════════╣
+║ Exactitud Sellos (Ley 20.606):       20.00% ± 42.16%  ║
+║ Tasa Omisión Riesgo Clínico:         80.00% ± 42.16%  ║
+║ Tasa Corrección Efectiva:             0.00% ±  0.00%  ║
+╠════════════════════════════════════════════════════════════════════════╣
+║ Latencia Promedio:                        0 ms ±      0    ║
+║ Llamadas LLM (promedio):              0 llamadas                    ║
+║ Llamadas API (promedio):              0 llamadas                    ║
+║ Costo Combinado:                      0.000                       ║
+║ Tasa de Errores:                    100.00%                      ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════════════════════════════════╗
+║ BASELINE: NUTRICHECK                | CASOS:  10                    ║
+╠════════════════════════════════════════════════════════════════════════╣
+║ Exactitud Sellos (Ley 20.606):       40.00% ± 51.64%  ║
+║ Tasa Omisión Riesgo Clínico:         80.00% ± 42.16%  ║
+║ Tasa Corrección Efectiva:             0.00% ±  0.00%  ║
+╠════════════════════════════════════════════════════════════════════════╣
+║ Latencia Promedio:                     5036 ms ±   6514    ║
+║ Llamadas LLM (promedio):              0 llamadas                    ║
+║ Llamadas API (promedio):              0 llamadas                    ║
+║ Costo Combinado:                      5.036                       ║
+║ Tasa de Errores:                      0.00%                      ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+================================================================================
+COMPARACIÓN DE MÉTRICAS CLAVE
+================================================================================
+
+Métrica                                  | simple          | react           | nutricheck     
+-------------------------------------------------------------------------------------------------
+Exactitud Sellos (Ley 20.606)            | 20.0%           | 20.0%           | 40.0%          
+Tasa Omisión Riesgo Clínico              | 80.0%           | 80.0%           | 80.0%          
+Tasa Corrección Efectiva                 | 0.0%            | 0.0%            | 0.0%           
+Latencia Promedio                        | 0ms             | 0ms             | 5036ms         
+Llamadas LLM (promedio)                  | 0               | 0               | 0              
+Llamadas API (promedio)                  | 1               | 0               | 0              
+
+================================================================================
+ANÁLISIS DE TRADE-OFF: PRECISIÓN vs COSTO
+================================================================================
+
+simple:
+  Precisión (score):        20.0%
+  Costo (time + calls):     0.000
+  Ratio Precisión/Costo:   2000.00
+  Tasa de Errores:          100.0%
+
+react:
+  Precisión (score):        20.0%
+  Costo (time + calls):     0.000
+  Ratio Precisión/Costo:   2000.00
+  Tasa de Errores:          100.0%
+
+nutricheck:
+  Precisión (score):        30.0%
+  Costo (time + calls):     5.036
+  Ratio Precisión/Costo:   5.96
+  Tasa de Errores:          0.0%
+
+================================================================================
+CONCLUSIONES
+================================================================================
+
+✓ Mejor Exactitud de Sellos:    nutricheck (40.0%)
+✓ Mejor Latencia:               react (0ms)
+✓ Mejor Precisión General:      nutricheck
+
+================================================================================

@@ -1,0 +1,69 @@
+{
+  "simple": {
+    "num_casos": 10,
+    "exactitud_sellos_promedio": 0.2,
+    "exactitud_sellos_std": 0.4216370213557839,
+    "tasa_omision_promedio": 0.8,
+    "tasa_omision_std": 0.4216370213557839,
+    "tasa_correccion_efectiva_promedio": 0.0,
+    "latencia_promedio_ms": 0.4278898239135742,
+    "latencia_std_ms": 1.0597610458304276,
+    "num_llamadas_llm_promedio": 0,
+    "num_llamadas_api_promedio": 1,
+    "costo_promedio": 0.00042788982391357423,
+    "tasa_errores": 1.0,
+    "errores": [
+      "Producto no encontrado: Leche Condensada 397 g",
+      "Producto no encontrado: Leche Colun Descremada 1 L",
+      "Producto no encontrado: Cheezels Sabor Queso 100 g",
+      "Producto no encontrado: Hamburguesa de Vacuno Montina 150 g",
+      "Producto no encontrado: Crema Maggi Mariscos 45 g",
+      "Producto no encontrado: Galletas Gretel Yogurt Frutilla 85 g",
+      "Producto no encontrado: Pat\u00e9 de Cerdo Llanquihue 125 g",
+      "Producto no encontrado: Chocolate de Leche Trencito 80 g",
+      "Producto no encontrado: Yogurt Loncoleche Prote\u00edna Natural 140 g",
+      "Producto no encontrado: Mantequilla Loncoleche 200 g"
+    ]
+  },
+  "react": {
+    "num_casos": 10,
+    "exactitud_sellos_promedio": 0.2,
+    "exactitud_sellos_std": 0.4216370213557839,
+    "tasa_omision_promedio": 0.8,
+    "tasa_omision_std": 0.4216370213557839,
+    "tasa_correccion_efectiva_promedio": 0.0,
+    "latencia_promedio_ms": 0.004029273986816406,
+    "latencia_std_ms": 0.003777177059725942,
+    "num_llamadas_llm_promedio": 0,
+    "num_llamadas_api_promedio": 0,
+    "costo_promedio": 4.029273986816406e-06,
+    "tasa_errores": 1.0,
+    "errores": [
+      "'Mistral' object has no attribute 'messages'",
+      "'Mistral' object has no attribute 'messages'",
+      "'Mistral' object has no attribute 'messages'",
+      "'Mistral' object has no attribute 'messages'",
+      "'Mistral' object has no attribute 'messages'",
+      "'Mistral' object has no attribute 'messages'",
+      "'Mistral' object has no attribute 'messages'",
+      "'Mistral' object has no attribute 'messages'",
+      "'Mistral' object has no attribute 'messages'",
+      "'Mistral' object has no attribute 'messages'"
+    ]
+  },
+  "nutricheck": {
+    "num_casos": 10,
+    "exactitud_sellos_promedio": 0.4,
+    "exactitud_sellos_std": 0.5163977794943223,
+    "tasa_omision_promedio": 0.8,
+    "tasa_omision_std": 0.4216370213557839,
+    "tasa_correccion_efectiva_promedio": 0.0,
+    "latencia_promedio_ms": 5036.16795539856,
+    "latencia_std_ms": 6513.939728856903,
+    "num_llamadas_llm_promedio": 0,
+    "num_llamadas_api_promedio": 0,
+    "costo_promedio": 5.036167955398559,
+    "tasa_errores": 0.0,
+    "errores": []
+  }
+}

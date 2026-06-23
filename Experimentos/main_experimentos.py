@@ -20,7 +20,7 @@ if str(RAIZ_PROYECTO) not in sys.path:
 # 3. IMPORTS DE TU PROYECTO
 from Experimentos.baselines import BaselineSimpleRAG, BaselineReActUnico, BaselineNutriCheckCompleto
 from Experimentos.datos.dataset import CasoPrueba, obtener_dataset  # Dataset real sincronizado con Jumbo
-from metricas.metricas import MetricasRespuesta, MetricasAgregadas
+from Experimentos.metricas.metricas import MetricasRespuesta, MetricasAgregadas
 
 # --- SOLUCIÓN PARA LA RESOLUCIÓN DE PUERTOS MCP ---
 # Resuelve dinámicamente las variables que contienen expresiones tipo ${VAR}

@@ -121,16 +121,18 @@ Responde SOLO con JSON:
 
 Ejemplo: {{"accion": "buscar_producto", "args": {{"nombre": "producto_name"}}}}"""
 
-        response = self.client.messages.create(
+        response = self.client.chat.complete(
             model=self.mistral_model,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=256,
+            temperature=0,
+            response_format={"type": "json_object"},
         )
 
         try:
-            resultado = json.loads(response.content[0].text)
+            resultado = json.loads(response.choices[0].message.content)
             return resultado.get("accion", "finalizar"), resultado.get("args", {})
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, TypeError):
             return "finalizar", {}
 
     def _buscar_producto(self, nombre: str) -> Optional[dict]:
@@ -171,13 +173,14 @@ Responde en formato:
 🔍 *JUSTIFICACIÓN*: [breve]
 💬 *CONSEJO*: [alternativa]"""
 
-        response = self.client.messages.create(
+        response = self.client.chat.complete(
             model=self.mistral_model,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=512,
+            temperature=0.1,
         )
 
-        return f"{DISCLAIMER}\n\n{response.content[0].text}"
+        return f"{DISCLAIMER}\n\n{response.choices[0].message.content}"
 
     def _extraer_veredicto(self, respuesta: str) -> str:
         """Extrae veredicto de la respuesta."""

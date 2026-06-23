@@ -113,13 +113,14 @@ Usa el formato:
 🔍 *JUSTIFICACIÓN*: [explicación]
 💬 *CONSEJO*: [consejo]"""
 
-        response = self.client.messages.create(
+        response = self.client.chat.complete(
             model=self.mistral_model,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1024,
+            temperature=0.1,
         )
 
-        return response.content[0].text
+        return response.choices[0].message.content
 
     def _formatear_contexto(self, producto: dict) -> str:
         """Formatea los datos del producto como contexto."""
